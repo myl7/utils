@@ -4,7 +4,9 @@
 package utils
 
 import (
+	"bytes"
 	"math"
+	"net/http"
 	"time"
 )
 
@@ -48,4 +50,19 @@ func (o *RetryOpt) BlockExpInterval(t time.Duration, max time.Duration) *RetryOp
 		time.Sleep(time.Duration(nt))
 	}
 	return o
+}
+
+func HTTPGetWithRetry(url string, opt *RetryOpt) any {
+	f := func(arg any) (any, error) {
+		return http.Get(arg.(string))
+	}
+	return WithRetry(f, url, opt)
+}
+
+func HTTPPostWithRetry(url, contentType, body string, opt *RetryOpt) any {
+	f := func(arg any) (any, error) {
+		args := arg.([]string)
+		return http.Post(args[0], args[1], bytes.NewReader([]byte(args[2])))
+	}
+	return WithRetry(f, []string{url, contentType, body}, opt)
 }
