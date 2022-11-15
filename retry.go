@@ -52,17 +52,17 @@ func (o *RetryOpt) BlockExpInterval(t time.Duration, max time.Duration) *RetryOp
 	return o
 }
 
-func HTTPGetWithRetry(url string, opt *RetryOpt) any {
+func HTTPGetWithRetry(url string, opt *RetryOpt) *http.Response {
 	f := func(arg any) (any, error) {
 		return http.Get(arg.(string))
 	}
-	return WithRetry(f, url, opt)
+	return WithRetry(f, url, opt).(*http.Response)
 }
 
-func HTTPPostWithRetry(url, contentType, body string, opt *RetryOpt) any {
+func HTTPPostWithRetry(url, contentType, body string, opt *RetryOpt) *http.Response {
 	f := func(arg any) (any, error) {
 		args := arg.([]string)
 		return http.Post(args[0], args[1], bytes.NewReader([]byte(args[2])))
 	}
-	return WithRetry(f, []string{url, contentType, body}, opt)
+	return WithRetry(f, []string{url, contentType, body}, opt).(*http.Response)
 }
